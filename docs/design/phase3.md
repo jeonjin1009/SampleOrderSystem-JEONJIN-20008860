@@ -51,7 +51,7 @@ src/main/java/com/ssemi/sampleorder/
 | 거절 결과 안내 | "거절 완료 (REJECTED)" 출력 |
 | 전체 주문 수 집계 | REJECTED 제외한 상태(RESERVED + PRODUCING + CONFIRMED + RELEASE) 합산 |
 | 없는 주문 선택 | 범위 초과 번호 → "잘못된 선택입니다." 출력 |
-| **주문 목록 표시 범위** | **전체 주문 표시** (REJECTED 제외), 상태 우선순위 정렬: PRODUCING → CONFIRMED → RESERVED → RELEASE |
+| **주문 목록 표시 범위** | **RESERVED 상태만 표시** (PRD.md 3.4절 기준) |
 
 ---
 
@@ -69,11 +69,10 @@ public class OrderView {
     // 시료 주문 접수 폼 — sampleId, 고객명, 수량 입력 (없는 sampleId 재입력 루프)
     public void showCreateForm();
 
-    // 전체 주문 목록 출력 (REJECTED 제외, PRODUCING→CONFIRMED→RESERVED→RELEASE 우선순위 정렬)
-    // 번호 + 상태 + 주문ID(앞 8자리) + sampleId + 고객명 + 수량
-    public void showOrderList();
+    // RESERVED 주문 목록 출력 — 번호 + 주문ID(앞 8자리) + sampleId + 고객명 + 수량
+    public void showReservedList();
 
-    // 승인/거절 처리 — 전체 목록 출력 후 RESERVED 번호 선택, 승인/거절 선택
+    // 승인/거절 처리 — RESERVED 목록 출력 후 번호 선택, 승인/거절 선택
     public void showApproveRejectMenu();
 }
 ```
@@ -100,38 +99,28 @@ public class OrderView {
 시료 ID  >
 ```
 
-### 6-2. 승인/거절 — 전체 주문 목록 (상태 우선순위 정렬)
-
-정렬 순서: PRODUCING → CONFIRMED → RESERVED → RELEASE (REJECTED 제외)
+### 6-2. 승인/거절 — RESERVED 목록
 
 ```
 [주문 승인/거절]
-번호  상태        주문ID(앞 8자리)  시료ID  고객명    수량
-----------------------------------------------------------
-1     PRODUCING   a1b2c3d4         S001    홍길동    10
-2     CONFIRMED   b2c3d4e5         S002    이영희    3
-3     RESERVED    c3d4e5f6         S001    김철수    5
-4     RELEASE     d4e5f6g7         S003    박민수    2
+번호  주문ID(앞 8자리)  시료ID  고객명    수량
+--------------------------------------------------
+1     a1b2c3d4         S001    홍길동    10
+2     e5f6g7h8         S002    김철수    5
 
-승인/거절할 RESERVED 주문 번호 선택 (0: 취소) > 3
+선택 (번호, 0: 취소) > 1
 처리 선택 > 1. 승인 / 2. 거절
 선택 > 1
 
-승인 완료 (CONFIRMED) — 재고 차감: 5개
+승인 완료 (CONFIRMED) — 재고 차감: 10개
 ```
 
 재고 부족 시:
 ```
-승인 완료 (PRODUCING) — 생산 등록: 7개 / 예상 시간: 7000ms
+승인 완료 (PRODUCING) — 생산 등록: 13개 / 예상 시간: 13000ms
 ```
 
-RESERVED 이외 번호 선택 시:
-```
-승인/거절할 RESERVED 주문 번호 선택 (0: 취소) > 1
-해당 주문은 RESERVED 상태가 아닙니다. (현재: PRODUCING)
-```
-
-주문 없을 시:
+RESERVED 주문 없을 시:
 ```
 [주문 승인/거절]
 접수된 주문이 없습니다.
@@ -147,12 +136,11 @@ RESERVED 이외 번호 선택 시:
 |---|---|
 | `showCreateForm_정상입력_RESERVED등록` | 유효한 sampleId 입력 시 RESERVED 주문 생성 |
 | `showCreateForm_없는sampleId_재입력유도` | 없는 sampleId 입력 후 오류 메시지 출력 + 재입력 루프 |
-| `showOrderList_상태우선순위_정렬출력` | PRODUCING→CONFIRMED→RESERVED→RELEASE 순서로 출력됨 확인 |
-| `showOrderList_빈목록_안내메시지` | 주문 없을 시 "접수된 주문이 없습니다." 출력 |
-| `showApproveRejectMenu_승인_재고충분_CONFIRMED` | RESERVED 번호 선택 후 승인 시 CONFIRMED 전환 출력 |
-| `showApproveRejectMenu_승인_재고부족_PRODUCING` | RESERVED 번호 선택 후 승인 시 PRODUCING 전환 출력 |
-| `showApproveRejectMenu_거절_REJECTED` | RESERVED 번호 선택 후 거절 시 REJECTED 전환 출력 |
-| `showApproveRejectMenu_비RESERVED선택_오류메시지` | PRODUCING 등 비RESERVED 번호 선택 시 오류 메시지 출력 |
+| `showReservedList_목록출력` | RESERVED 주문 목록이 번호와 함께 출력됨 확인 |
+| `showReservedList_빈목록_안내메시지` | RESERVED 주문 없을 시 "접수된 주문이 없습니다." 출력 |
+| `showApproveRejectMenu_승인_재고충분_CONFIRMED` | 번호 선택 후 승인 시 CONFIRMED 전환 출력 |
+| `showApproveRejectMenu_승인_재고부족_PRODUCING` | 번호 선택 후 승인 시 PRODUCING 전환 출력 |
+| `showApproveRejectMenu_거절_REJECTED` | 번호 선택 후 거절 시 REJECTED 전환 출력 |
 
 ### 7-2. AppIntegrationTest 추가
 
@@ -192,7 +180,7 @@ RESERVED 이외 번호 선택 시:
 | # | 포인트 | 선택지 |
 |---|---|---|
 | 4 | **승인 결과 상세 표시** | "CONFIRMED" 단순 출력 vs "재고 차감: N개" / "생산 등록: N개, 예상 시간: Nms" 상세 출력 |
-| 5 | **주문 목록 표시 범위** | ~~RESERVED만 표시~~ → **전체 표시** (PRODUCING→CONFIRMED→RESERVED→RELEASE 우선순위 정렬, REJECTED 제외) |
+| 5 | **주문 목록 표시 범위** | RESERVED 상태만 표시 (PRD.md 3.4절 기준) |
 | 6 | **주문 ID 표시 방식** | UUID 전체(36자) vs 앞 8자리만 축약 표시 |
 
 ### P3 — App.java 연결 구조 (기술 결정)
