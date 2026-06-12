@@ -38,8 +38,21 @@ public class OrderView {
         System.out.print("고객명   > ");
         String customerName = scanner.nextLine().trim();
 
-        System.out.print("주문 수량 > ");
-        int quantity = Integer.parseInt(scanner.nextLine().trim());
+        int quantity;
+        while (true) {
+            System.out.print("주문 수량 > ");
+            String qtyInput = scanner.nextLine().trim();
+            try {
+                quantity = Integer.parseInt(qtyInput);
+                if (quantity <= 0) {
+                    System.out.println("오류: 1 이상의 수량을 입력해 주세요.");
+                    continue;
+                }
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("오류: 숫자를 입력해 주세요.");
+            }
+        }
 
         Order order = orderController.createOrder(sampleId, customerName, quantity);
         System.out.println();
