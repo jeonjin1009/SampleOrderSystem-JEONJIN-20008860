@@ -2,7 +2,7 @@ package com.ssemi.sampleorder.production;
 
 import com.ssemi.sampleorder.model.Order;
 import com.ssemi.sampleorder.model.OrderStatus;
-import com.ssemi.sampleorder.model.ProductionJob;
+import com.ssemi.sampleorder.production.ProductionJob;
 import com.ssemi.sampleorder.model.Sample;
 import com.ssemi.sampleorder.repository.CsvOrderRepository;
 import com.ssemi.sampleorder.repository.CsvSampleRepository;
