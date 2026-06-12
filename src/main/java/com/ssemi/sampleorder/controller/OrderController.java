@@ -40,8 +40,6 @@ public class OrderController {
         Sample sample = sampleRepository.findById(order.getSampleId()).orElseThrow();
 
         if (sample.getStock() >= order.getQuantity()) {
-            sample.setStock(sample.getStock() - order.getQuantity());
-            sampleRepository.update(sample);
             order.setStatus(OrderStatus.CONFIRMED);
         } else {
             int shortage = order.getQuantity() - sample.getStock();

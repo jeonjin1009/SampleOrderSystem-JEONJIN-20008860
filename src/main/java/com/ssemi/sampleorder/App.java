@@ -1,7 +1,9 @@
 package com.ssemi.sampleorder;
 
+import com.ssemi.sampleorder.controller.MonitoringController;
 import com.ssemi.sampleorder.controller.OrderController;
 import com.ssemi.sampleorder.controller.ProductionController;
+import com.ssemi.sampleorder.controller.ReleaseController;
 import com.ssemi.sampleorder.controller.SampleController;
 import com.ssemi.sampleorder.production.ProductionLine;
 import com.ssemi.sampleorder.repository.CsvOrderRepository;
@@ -20,8 +22,11 @@ public class App {
         ProductionLine productionLine = new ProductionLine(orderRepository, sampleRepository);
         OrderController orderController = new OrderController(sampleRepository, orderRepository, productionLine);
         ProductionController productionController = new ProductionController(productionLine);
+        MonitoringController monitoringController = new MonitoringController(orderRepository, sampleRepository);
+        ReleaseController releaseController = new ReleaseController(orderRepository, sampleRepository);
         Scanner scanner = new Scanner(System.in);
-        MainView mainView = new MainView(sampleController, orderController, productionController, scanner);
+        MainView mainView = new MainView(sampleController, orderController, productionController,
+                monitoringController, releaseController, scanner);
         mainView.run();
     }
 }

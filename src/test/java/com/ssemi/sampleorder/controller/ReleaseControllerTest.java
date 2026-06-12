@@ -29,12 +29,12 @@ class ReleaseControllerTest {
     void setUp() {
         orderRepository   = new CsvOrderRepository(tempDir.resolve("orders.csv").toString());
         sampleRepository  = new CsvSampleRepository(tempDir.resolve("samples.csv").toString());
-        // RED 단계: 현재 시그니처 유지 (GREEN에서 sampleRepository 추가 예정)
-        releaseController = new ReleaseController(orderRepository);
+        releaseController = new ReleaseController(orderRepository, sampleRepository);
     }
 
     @Test
     void release_CONFIRMED주문_RELEASE로전환() {
+        sampleRepository.save(new Sample("S001", "시료A", 1000L, 0.9, 50));
         orderRepository.save(new Order("O001", "S001", "고객A", 10, OrderStatus.CONFIRMED));
 
         Order released = releaseController.release("O001");

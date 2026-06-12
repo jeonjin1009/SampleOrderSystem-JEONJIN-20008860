@@ -1,7 +1,9 @@
 package com.ssemi.sampleorder.view;
 
+import com.ssemi.sampleorder.controller.MonitoringController;
 import com.ssemi.sampleorder.controller.OrderController;
 import com.ssemi.sampleorder.controller.ProductionController;
+import com.ssemi.sampleorder.controller.ReleaseController;
 import com.ssemi.sampleorder.controller.SampleController;
 import com.ssemi.sampleorder.model.OrderStatus;
 import com.ssemi.sampleorder.model.Sample;
@@ -17,10 +19,15 @@ public class MainView {
     private final SampleView sampleView;
     private final OrderView orderView;
     private final ProductionView productionView;
+    private final MonitoringView monitoringView;
+    private final ReleaseView releaseView;
     private final Scanner scanner;
 
     public MainView(SampleController sampleController, OrderController orderController,
-                    ProductionController productionController, Scanner scanner) {
+                    ProductionController productionController,
+                    MonitoringController monitoringController,
+                    ReleaseController releaseController,
+                    Scanner scanner) {
         this.sampleController = sampleController;
         this.orderController = orderController;
         this.productionController = productionController;
@@ -28,6 +35,8 @@ public class MainView {
         this.sampleView = new SampleView(sampleController, scanner);
         this.orderView = new OrderView(orderController, sampleController, scanner);
         this.productionView = new ProductionView(productionController);
+        this.monitoringView = new MonitoringView(monitoringController, sampleController);
+        this.releaseView = new ReleaseView(releaseController, scanner);
     }
 
     public void run() {
@@ -37,9 +46,9 @@ public class MainView {
             System.out.println("1. 시료 관리");
             System.out.println("2. 시료 주문");
             System.out.println("3. 주문 승인/거절");
-            System.out.println("4. 모니터링             (추후 구현)");
+            System.out.println("4. 모니터링");
             System.out.println("5. 생산 라인 조회");
-            System.out.println("6. 출고 처리            (추후 구현)");
+            System.out.println("6. 출고 처리");
             System.out.println("0. 종료");
             System.out.print("선택 > ");
             String input = scanner.nextLine().trim();
@@ -55,11 +64,13 @@ public class MainView {
                     orderView.showApproveRejectMenu();
                     break;
                 case "4":
-                case "6":
-                    System.out.println("추후 구현 예정입니다.");
+                    monitoringView.show();
                     break;
                 case "5":
                     productionView.showProductionStatus();
+                    break;
+                case "6":
+                    releaseView.showReleaseMenu();
                     break;
                 case "0":
                     return;

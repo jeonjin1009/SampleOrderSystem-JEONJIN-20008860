@@ -41,8 +41,7 @@ class AppIntegrationTest {
         productionLine = new ProductionLine(orderRepository, sampleRepository);
         sampleController = new SampleController(sampleRepository);
         orderController = new OrderController(sampleRepository, orderRepository, productionLine);
-        // RED 단계: 현재 시그니처 유지 (GREEN에서 sampleRepository 추가 예정)
-        releaseController = new ReleaseController(orderRepository);
+        releaseController = new ReleaseController(orderRepository, sampleRepository);
     }
 
     @AfterEach

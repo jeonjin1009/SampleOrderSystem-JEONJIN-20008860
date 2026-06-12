@@ -34,10 +34,10 @@ public class MonitoringController {
             return StockStatus.EMPTY;
         }
 
-        // REJECTED를 제외한 모든 주문의 수량 합산
+        // 진행 중인 주문(RESERVED + PRODUCING)만 재고 압박 지표로 합산
         int totalOrdered = orderRepository.findAll().stream()
                 .filter(o -> o.getSampleId().equals(sampleId))
-                .filter(o -> o.getStatus() != OrderStatus.REJECTED)
+                .filter(o -> o.getStatus() == OrderStatus.RESERVED || o.getStatus() == OrderStatus.PRODUCING)
                 .mapToInt(Order::getQuantity)
                 .sum();
 

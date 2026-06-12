@@ -3,6 +3,7 @@ package com.ssemi.sampleorder.view;
 import com.ssemi.sampleorder.controller.ReleaseController;
 import com.ssemi.sampleorder.model.Order;
 import com.ssemi.sampleorder.model.OrderStatus;
+import com.ssemi.sampleorder.model.Sample;
 import com.ssemi.sampleorder.repository.CsvOrderRepository;
 import com.ssemi.sampleorder.repository.CsvSampleRepository;
 import com.ssemi.sampleorder.repository.OrderRepository;
@@ -35,12 +36,12 @@ class ReleaseViewTest {
     void setUp() {
         orderRepository = new CsvOrderRepository(tempDir.resolve("orders.csv").toString());
         sampleRepository = new CsvSampleRepository(tempDir.resolve("samples.csv").toString());
-        // RED 단계: 현재 시그니처 유지 (GREEN에서 sampleRepository 추가 예정)
-        releaseController = new ReleaseController(orderRepository);
+        releaseController = new ReleaseController(orderRepository, sampleRepository);
     }
 
     @Test
     void showReleaseMenu_정상출고_RELEASE전환() {
+        sampleRepository.save(new Sample("S001", "시료A", 1000L, 0.9, 50));
         orderRepository.save(new Order("O001", "S001", "홍길동", 10, OrderStatus.CONFIRMED));
 
         ByteArrayInputStream in = new ByteArrayInputStream("1\n".getBytes());
