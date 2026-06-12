@@ -45,6 +45,14 @@ class SampleControllerTest {
     }
 
     @Test
+    void addSample_중복이름_예외발생() {
+        sampleController.addSample("S001", "시료A", 1000L, 0.9);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> sampleController.addSample("S002", "시료A", 2000L, 0.8));
+    }
+
+    @Test
     void listSamples_ID오름차순정렬() {
         sampleController.addSample("S003", "시료C", 1000L, 0.9);
         sampleController.addSample("S001", "시료A", 1000L, 0.9);

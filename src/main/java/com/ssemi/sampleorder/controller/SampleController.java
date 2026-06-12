@@ -20,6 +20,11 @@ public class SampleController {
         if (sampleRepository.findById(id).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 시료 ID입니다: " + id);
         }
+        boolean nameExists = sampleRepository.findAll().stream()
+                .anyMatch(s -> s.getName().equals(name));
+        if (nameExists) {
+            throw new IllegalArgumentException("이미 존재하는 시료 이름입니다: " + name);
+        }
         Sample sample = new Sample(id, name, avgProductionTimeMs, yield, 0);
         return sampleRepository.save(sample);
     }

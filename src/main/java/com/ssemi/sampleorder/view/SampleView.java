@@ -28,8 +28,15 @@ public class SampleView {
             System.out.println("오류: 이미 존재하는 시료 ID입니다. 다시 입력해 주세요.");
         }
 
-        System.out.print("이름 > ");
-        String name = scanner.nextLine().trim();
+        String name = "";
+        while (true) {
+            System.out.print("이름 > ");
+            String candidate = scanner.nextLine().trim();
+            boolean duplicate = sampleController.listSamples().stream()
+                    .anyMatch(s -> s.getName().equals(candidate));
+            if (!duplicate) { name = candidate; break; }
+            System.out.println("오류: 이미 존재하는 시료 이름입니다. 다시 입력해 주세요.");
+        }
 
         System.out.print("평균생산시간(ms) > ");
         long avgProductionTimeMs = Long.parseLong(scanner.nextLine().trim());
@@ -37,7 +44,6 @@ public class SampleView {
         System.out.print("수율 > ");
         double yield = Double.parseDouble(scanner.nextLine().trim());
 
-        // addSample에서 IllegalArgumentException 발생 시 오류 출력 (동시성 안전망)
         try {
             Sample sample = sampleController.addSample(id, name, avgProductionTimeMs, yield);
             System.out.println("등록 완료: " + sample.getId() + " / " + sample.getName());
