@@ -6,6 +6,7 @@ import com.ssemi.sampleorder.model.Order;
 import com.ssemi.sampleorder.model.OrderStatus;
 import com.ssemi.sampleorder.model.Sample;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -94,10 +95,27 @@ public class OrderView {
             System.out.println("접수된 주문이 없습니다.");
             return;
         }
+
+        // 시료가 삭제된 주문은 자동 거절 처리 후 목록에서 제외
+        List<Order> validOrders = new ArrayList<>();
+        for (Order o : reserved) {
+            if (sampleController.findSampleById(o.getSampleId()).isPresent()) {
+                validOrders.add(o);
+            } else {
+                orderController.rejectOrder(o.getId());
+                System.out.println("알림 [" + o.getId().substring(0, 8) + "...]: 주문하신 시료가 현재 사라졌습니다. 시료 확인 후 다시 주문 부탁드립니다.");
+            }
+        }
+
+        if (validOrders.isEmpty()) {
+            System.out.println("처리 가능한 주문이 없습니다.");
+            return;
+        }
+
         System.out.printf("%-4s  %-16s  %-6s  %-8s  %s%n", "번호", "주문ID(앞 8자리)", "시료ID", "고객명", "수량");
         System.out.println("--------------------------------------------------");
-        for (int i = 0; i < reserved.size(); i++) {
-            Order o = reserved.get(i);
+        for (int i = 0; i < validOrders.size(); i++) {
+            Order o = validOrders.get(i);
             System.out.printf("%-4d  %-16s  %-6s  %-8s  %d%n",
                     i + 1,
                     o.getId().substring(0, 8),
@@ -117,12 +135,12 @@ public class OrderView {
         }
 
         if (idx == 0) return;
-        if (idx < 1 || idx > reserved.size()) {
+        if (idx < 1 || idx > validOrders.size()) {
             System.out.println("잘못된 선택입니다.");
             return;
         }
 
-        Order selected = reserved.get(idx - 1);
+        Order selected = validOrders.get(idx - 1);
         String orderId = selected.getId();
 
         Sample sample = sampleController.findSampleById(selected.getSampleId()).orElseThrow();

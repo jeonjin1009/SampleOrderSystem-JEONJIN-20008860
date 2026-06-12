@@ -184,4 +184,21 @@ class OrderViewTest {
                 "출력에 'REJECTED'가 포함되어야 함. 실제 출력: " + output
         );
     }
+
+    @Test
+    void showApproveRejectMenu_시료삭제된주문_안내메시지출력_목록에서제외() {
+        // 주문 후 시료 삭제
+        sampleRepository.save(new Sample("S001", "시료A", 1000L, 0.9, 0));
+        orderController.createOrder("S001", "홍길동", 10);
+        sampleRepository.deleteById("S001");
+
+        ByteArrayOutputStream out = captureOut();
+        OrderView view = buildView("");
+
+        view.showApproveRejectMenu();
+
+        String output = out.toString();
+        assertTrue(output.contains("시료가 현재 사라졌습니다"), "시료 삭제 안내 메시지가 포함되어야 함. 실제 출력: " + output);
+        assertTrue(output.contains("처리 가능한 주문이 없습니다"), "처리 가능한 주문 없음 메시지가 포함되어야 함. 실제 출력: " + output);
+    }
 }
