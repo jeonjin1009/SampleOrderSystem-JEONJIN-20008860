@@ -165,7 +165,8 @@ public interface OrderRepository {
 | `approveOrder_재고부족_PRODUCING으로전환` | 재고 < 주문수량일 때 승인 → PRODUCING |
 | `approveOrder_재고충분_재고가차감된다` | 승인 후 Sample.stock이 수량만큼 감소 |
 | `rejectOrder_REJECTED로전환` | 거절 처리 후 status == REJECTED |
-| `approveOrder_없는주문ID_예외발생` | 미존재 주문 ID 승인 시 예외 |
+| `approveOrder_없는주문ID_예외발생` | 미존재 주문 ID 승인 시 `IllegalArgumentException` |
+| `createOrder_없는샘플ID_예외발생` | 등록되지 않은 sampleId로 주문 생성 시 `IllegalArgumentException` |
 
 ### 4-4. ProductionLineTest
 

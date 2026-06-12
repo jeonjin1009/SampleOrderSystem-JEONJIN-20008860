@@ -7,9 +7,10 @@ PoC에서 검증한 MVC 패턴 + CSV 파일 영속성을 그대로 적용한다.
 
 ```
 com.ssemi.sampleorder
-├── model/          도메인 객체 (Sample, Order, ProductionJob)
+├── model/          도메인 객체 (Sample, Order, OrderStatus, StockStatus)
 ├── repository/     CSV 파일 CRUD (SampleRepository, OrderRepository)
 ├── controller/     비즈니스 로직
+├── production/     생산 라인 (ProductionJob, ProductionLine)
 ├── view/           콘솔 입출력
 └── App.java        진입점
 ```
