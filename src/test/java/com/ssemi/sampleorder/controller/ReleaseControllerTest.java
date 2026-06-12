@@ -2,8 +2,11 @@ package com.ssemi.sampleorder.controller;
 
 import com.ssemi.sampleorder.model.Order;
 import com.ssemi.sampleorder.model.OrderStatus;
+import com.ssemi.sampleorder.model.Sample;
 import com.ssemi.sampleorder.repository.CsvOrderRepository;
+import com.ssemi.sampleorder.repository.CsvSampleRepository;
 import com.ssemi.sampleorder.repository.OrderRepository;
+import com.ssemi.sampleorder.repository.SampleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -19,11 +22,14 @@ class ReleaseControllerTest {
     Path tempDir;
 
     private OrderRepository orderRepository;
+    private SampleRepository sampleRepository;
     private ReleaseController releaseController;
 
     @BeforeEach
     void setUp() {
-        orderRepository  = new CsvOrderRepository(tempDir.resolve("orders.csv").toString());
+        orderRepository   = new CsvOrderRepository(tempDir.resolve("orders.csv").toString());
+        sampleRepository  = new CsvSampleRepository(tempDir.resolve("samples.csv").toString());
+        // RED 단계: 현재 시그니처 유지 (GREEN에서 sampleRepository 추가 예정)
         releaseController = new ReleaseController(orderRepository);
     }
 
@@ -53,5 +59,28 @@ class ReleaseControllerTest {
 
         assertEquals(2, releasable.size());
         assertTrue(releasable.stream().allMatch(o -> o.getStatus() == OrderStatus.CONFIRMED));
+    }
+
+    @Test
+    void release_재고충분케이스_재고차감확인() {
+        sampleRepository.save(new Sample("S001", "시료A", 1000L, 0.9, 50));
+        orderRepository.save(new Order("O001", "S001", "고객A", 10, OrderStatus.CONFIRMED));
+
+        releaseController.release("O001");
+
+        Sample sample = sampleRepository.findById("S001").orElseThrow();
+        assertEquals(40, sample.getStock());
+    }
+
+    @Test
+    void release_재고부족케이스_재고차감확인() {
+        // 생산 완료 후 입고된 상태 시뮬레이션: 재고 12
+        sampleRepository.save(new Sample("S001", "시료A", 1000L, 0.9, 12));
+        orderRepository.save(new Order("O001", "S001", "고객A", 10, OrderStatus.CONFIRMED));
+
+        releaseController.release("O001");
+
+        Sample sample = sampleRepository.findById("S001").orElseThrow();
+        assertEquals(2, sample.getStock());
     }
 }

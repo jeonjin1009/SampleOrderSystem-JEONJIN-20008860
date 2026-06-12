@@ -70,14 +70,14 @@ class OrderControllerTest {
     }
 
     @Test
-    void approveOrder_재고충분_재고가차감된다() {
+    void approveOrder_재고충분_재고불변() {
         sampleRepository.save(new Sample("S001", "시료A", 1000L, 0.9, 50));
         Order order = orderController.createOrder("S001", "고객A", 10);
 
         orderController.approveOrder(order.getId());
 
         Sample sample = sampleRepository.findById("S001").orElseThrow();
-        assertEquals(40, sample.getStock());
+        assertEquals(50, sample.getStock());
     }
 
     @Test
