@@ -111,6 +111,20 @@ class OrderControllerTest {
     }
 
     @Test
+    void approveOrder_PRODUCING주문있을때_가용재고기준으로PRODUCING전환() {
+        // stock=8, 첫 주문 10개 → PRODUCING (가용 재고 -2)
+        // 두 번째 주문 10개 → 가용 재고(-2) < 10 → PRODUCING (독립 생산 방지)
+        sampleRepository.save(new Sample("S001", "시료A", 1000L, 0.9, 8));
+        Order orderA = orderController.createOrder("S001", "고객A", 10);
+        orderController.approveOrder(orderA.getId()); // PRODUCING
+
+        Order orderB = orderController.createOrder("S001", "고객B", 10);
+        Order approved = orderController.approveOrder(orderB.getId());
+
+        assertEquals(OrderStatus.PRODUCING, approved.getStatus());
+    }
+
+    @Test
     void approveOrder_CONFIRMED주문있어도_가용재고충분하면_CONFIRMED전환() {
         // stock=50, 첫 주문 20개 CONFIRMED → 가용 재고 30개
         sampleRepository.save(new Sample("S001", "시료A", 1000L, 0.9, 50));

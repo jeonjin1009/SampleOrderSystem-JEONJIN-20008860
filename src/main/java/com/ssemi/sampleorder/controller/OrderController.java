@@ -58,11 +58,13 @@ public class OrderController {
 
     public int getAvailableStock(String sampleId) {
         Sample sample = sampleRepository.findById(sampleId).orElseThrow();
-        int confirmedQty = orderRepository.findByStatus(OrderStatus.CONFIRMED).stream()
+        int reservedQty = orderRepository.findAll().stream()
                 .filter(o -> o.getSampleId().equals(sampleId))
+                .filter(o -> o.getStatus() == OrderStatus.CONFIRMED
+                          || o.getStatus() == OrderStatus.PRODUCING)
                 .mapToInt(Order::getQuantity)
                 .sum();
-        return sample.getStock() - confirmedQty;
+        return sample.getStock() - reservedQty;
     }
 
     public Order rejectOrder(String orderId) {
