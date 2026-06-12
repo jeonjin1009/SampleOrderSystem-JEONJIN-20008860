@@ -5,6 +5,7 @@ import com.ssemi.sampleorder.repository.SampleRepository;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class SampleController {
@@ -39,5 +40,9 @@ public class SampleController {
         sampleRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시료 ID입니다: " + id));
         return sampleRepository.deleteById(id);
+    }
+
+    public Optional<Sample> findSampleById(String id) {
+        return sampleRepository.findById(id);
     }
 }

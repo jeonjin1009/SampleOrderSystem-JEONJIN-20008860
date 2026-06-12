@@ -1,6 +1,8 @@
 package com.ssemi.sampleorder.view;
 
+import com.ssemi.sampleorder.controller.OrderController;
 import com.ssemi.sampleorder.controller.SampleController;
+import com.ssemi.sampleorder.model.OrderStatus;
 import com.ssemi.sampleorder.model.Sample;
 
 import java.util.List;
@@ -9,13 +11,17 @@ import java.util.Scanner;
 public class MainView {
 
     private final SampleController sampleController;
+    private final OrderController orderController;
     private final SampleView sampleView;
+    private final OrderView orderView;
     private final Scanner scanner;
 
-    public MainView(SampleController sampleController, Scanner scanner) {
+    public MainView(SampleController sampleController, OrderController orderController, Scanner scanner) {
         this.sampleController = sampleController;
+        this.orderController = orderController;
         this.scanner = scanner;
         this.sampleView = new SampleView(sampleController, scanner);
+        this.orderView = new OrderView(orderController, sampleController, scanner);
     }
 
     public void run() {
@@ -23,8 +29,8 @@ public class MainView {
             printSummary();
             System.out.println("=== 메인 메뉴 ===");
             System.out.println("1. 시료 관리");
-            System.out.println("2. 시료 주문            (추후 구현)");
-            System.out.println("3. 주문 승인/거절       (추후 구현)");
+            System.out.println("2. 시료 주문");
+            System.out.println("3. 주문 승인/거절");
             System.out.println("4. 모니터링             (추후 구현)");
             System.out.println("5. 생산 라인 조회       (추후 구현)");
             System.out.println("6. 출고 처리            (추후 구현)");
@@ -37,7 +43,11 @@ public class MainView {
                     showSampleMenu();
                     break;
                 case "2":
+                    orderView.showCreateForm();
+                    break;
                 case "3":
+                    orderView.showApproveRejectMenu();
+                    break;
                 case "4":
                 case "5":
                 case "6":
@@ -56,10 +66,14 @@ public class MainView {
         int totalSamples = samples.size();
         int totalStock = samples.stream().mapToInt(Sample::getStock).sum();
 
+        long totalOrders = orderController.listOrders().stream()
+                .filter(o -> o.getStatus() != OrderStatus.REJECTED)
+                .count();
+
         System.out.println("=== 현황 요약 ===");
         System.out.println("등록 시료 수: " + totalSamples);
         System.out.println("전체 재고 수: " + totalStock);
-        System.out.println("전체 주문 수: (추후 구현)");
+        System.out.println("전체 주문 수: " + totalOrders);
         System.out.println("생산 대기 건수: (추후 구현)");
     }
 

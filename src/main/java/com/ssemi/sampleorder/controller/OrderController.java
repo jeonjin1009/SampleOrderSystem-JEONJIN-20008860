@@ -8,6 +8,7 @@ import com.ssemi.sampleorder.production.ProductionLine;
 import com.ssemi.sampleorder.repository.OrderRepository;
 import com.ssemi.sampleorder.repository.SampleRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 public class OrderController {
@@ -62,5 +63,13 @@ public class OrderController {
         order.setStatus(OrderStatus.REJECTED);
         orderRepository.update(order);
         return order;
+    }
+
+    public List<Order> listOrders() {
+        return orderRepository.findAll();
+    }
+
+    public List<Order> findOrdersByStatus(OrderStatus status) {
+        return orderRepository.findByStatus(status);
     }
 }
