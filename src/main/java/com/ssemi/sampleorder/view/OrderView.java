@@ -54,8 +54,16 @@ public class OrderView {
             }
         }
 
-        Order order = orderController.createOrder(sampleId, customerName, quantity);
         System.out.println();
+        System.out.println("시료 ID: " + sampleId + " / 고객명: " + customerName + " / 주문수량: " + quantity);
+        System.out.print("이 입력하신 내용과 동일합니까? (y/n) > ");
+        String confirm = scanner.nextLine().trim();
+        if (!"y".equalsIgnoreCase(confirm)) {
+            System.out.println("주문이 취소되었습니다.");
+            return;
+        }
+
+        Order order = orderController.createOrder(sampleId, customerName, quantity);
         System.out.println("주문 접수 완료 (주문번호: " + order.getId().substring(0, 8) + "...) — RESERVED");
     }
 
@@ -117,16 +125,22 @@ public class OrderView {
         Order selected = reserved.get(idx - 1);
         String orderId = selected.getId();
 
+        Sample sample = sampleController.findSampleById(selected.getSampleId()).orElseThrow();
+        int stock = sample.getStock();
+        int quantity = selected.getQuantity();
+        if (stock >= quantity) {
+            System.out.println("[재고 현황] 현재 재고 " + stock + "개 — 주문 수량(" + quantity + "개) 충족. 생산이 필요하지 않습니다.");
+        } else {
+            int shortage = quantity - stock;
+            int required = (int) Math.ceil(shortage / sample.getYield() / 0.9);
+            System.out.println("[재고 현황] 현재 재고 " + stock + "개 — 부족(" + shortage + "개 부족). 생산이 필요합니다. (생산 필요량: " + required + "개)");
+        }
+
         System.out.println("처리 선택 > 1. 승인 / 2. 거절");
         System.out.print("선택 > ");
         String action = scanner.nextLine().trim();
 
         if ("1".equals(action)) {
-            // approveOrder 전에 재고 상태를 파악해 PRODUCING 메시지용 수치를 미리 계산
-            Sample sample = sampleController.findSampleById(selected.getSampleId()).orElseThrow();
-            int stock = sample.getStock();
-            int quantity = selected.getQuantity();
-
             orderController.approveOrder(orderId);
 
             // approveOrder 후 주문 상태로 분기

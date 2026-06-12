@@ -46,8 +46,8 @@ class SampleViewTest {
     void showList_출력에_ID정렬순서_포함() {
         // S002, S001 순서로 등록
         sampleController = new SampleController(sampleRepository);
-        sampleController.addSample("S002", "시료B", 1000L, 0.9);
-        sampleController.addSample("S001", "시료A", 1000L, 0.9);
+        sampleController.addSample("S002", "시료B", 1000L, 0.9, 0);
+        sampleController.addSample("S001", "시료A", 1000L, 0.9, 0);
 
         Scanner scanner = new Scanner(new ByteArrayInputStream("".getBytes()));
         SampleView sampleView = new SampleView(sampleController, scanner);
@@ -64,7 +64,7 @@ class SampleViewTest {
     @Test
     void showSearchResult_검색결과_출력포함() {
         sampleController = new SampleController(sampleRepository);
-        sampleController.addSample("S001", "시료A", 1000L, 0.9);
+        sampleController.addSample("S001", "시료A", 1000L, 0.9, 0);
 
         // 검색 키워드 입력 후 "n"으로 루프 종료
         String input = "시료\nn\n";
@@ -80,7 +80,7 @@ class SampleViewTest {
     void showAddForm_정상입력_등록성공() {
         sampleController = new SampleController(sampleRepository);
 
-        String input = "S001\n시료A\n1000\n0.9\n";
+        String input = "S001\n시료A\n1000\n0.9\n0\n";
         Scanner scanner = new Scanner(new ByteArrayInputStream(input.getBytes()));
         SampleView sampleView = new SampleView(sampleController, scanner);
         sampleView.showAddForm();
@@ -92,10 +92,10 @@ class SampleViewTest {
     void showAddForm_중복ID_재입력후_등록성공() {
         sampleController = new SampleController(sampleRepository);
         // S001을 미리 등록
-        sampleController.addSample("S001", "기존시료", 1000L, 0.9);
+        sampleController.addSample("S001", "기존시료", 1000L, 0.9, 0);
 
         // 중복 ID S001 입력 후 새 ID S002로 재입력
-        String input = "S001\nS002\n시료B\n2000\n0.8\n";
+        String input = "S001\nS002\n시료B\n2000\n0.8\n0\n";
         Scanner scanner = new Scanner(new ByteArrayInputStream(input.getBytes()));
         SampleView sampleView = new SampleView(sampleController, scanner);
         sampleView.showAddForm();

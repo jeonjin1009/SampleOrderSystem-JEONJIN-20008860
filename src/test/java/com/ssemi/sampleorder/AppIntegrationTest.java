@@ -51,7 +51,7 @@ class AppIntegrationTest {
 
     @Test
     void addSample_후_listSamples_포함확인() {
-        sampleController.addSample("S001", "시료A", 1000L, 0.9);
+        sampleController.addSample("S001", "시료A", 1000L, 0.9, 0);
 
         List<Sample> result = sampleController.listSamples();
 
@@ -60,7 +60,7 @@ class AppIntegrationTest {
 
     @Test
     void addSample_후_searchByName_검색됨() {
-        sampleController.addSample("S001", "시료A", 1000L, 0.9);
+        sampleController.addSample("S001", "시료A", 1000L, 0.9, 0);
 
         List<Sample> result = sampleController.searchByName("시료A");
 

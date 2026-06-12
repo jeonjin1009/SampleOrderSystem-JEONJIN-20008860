@@ -68,7 +68,7 @@ class OrderViewTest {
         sampleRepository.save(new Sample("S001", "시료A", 1000L, 0.9, 0));
 
         ByteArrayOutputStream out = captureOut();
-        OrderView view = buildView("S001\n홍길동\n10\n");
+        OrderView view = buildView("S001\n홍길동\n10\ny\n");
 
         view.showCreateForm();
 
@@ -85,7 +85,7 @@ class OrderViewTest {
         sampleRepository.save(new Sample("S001", "시료A", 1000L, 0.9, 0));
 
         ByteArrayOutputStream out = captureOut();
-        OrderView view = buildView("NONE\nS001\n홍길동\n10\n");
+        OrderView view = buildView("NONE\nS001\n홍길동\n10\ny\n");
 
         view.showCreateForm();
 

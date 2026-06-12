@@ -16,7 +16,7 @@ public class SampleController {
         this.sampleRepository = sampleRepository;
     }
 
-    public Sample addSample(String id, String name, long avgProductionTimeMs, double yield) {
+    public Sample addSample(String id, String name, long avgProductionTimeMs, double yield, int initialStock) {
         if (sampleRepository.findById(id).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 시료 ID입니다: " + id);
         }
@@ -25,7 +25,7 @@ public class SampleController {
         if (nameExists) {
             throw new IllegalArgumentException("이미 존재하는 시료 이름입니다: " + name);
         }
-        Sample sample = new Sample(id, name, avgProductionTimeMs, yield, 0);
+        Sample sample = new Sample(id, name, avgProductionTimeMs, yield, initialStock);
         return sampleRepository.save(sample);
     }
 

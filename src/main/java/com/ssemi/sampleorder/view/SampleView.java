@@ -44,8 +44,24 @@ public class SampleView {
         System.out.print("수율 > ");
         double yield = Double.parseDouble(scanner.nextLine().trim());
 
+        int initialStock;
+        while (true) {
+            System.out.print("초기 재고 > ");
+            String stockInput = scanner.nextLine().trim();
+            try {
+                initialStock = Integer.parseInt(stockInput);
+                if (initialStock < 0) {
+                    System.out.println("오류: 0 이상의 값을 입력해 주세요.");
+                    continue;
+                }
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("오류: 숫자를 입력해 주세요.");
+            }
+        }
+
         try {
-            Sample sample = sampleController.addSample(id, name, avgProductionTimeMs, yield);
+            Sample sample = sampleController.addSample(id, name, avgProductionTimeMs, yield, initialStock);
             System.out.println("등록 완료: " + sample.getId() + " / " + sample.getName());
         } catch (IllegalArgumentException e) {
             System.out.println("오류: " + e.getMessage());
