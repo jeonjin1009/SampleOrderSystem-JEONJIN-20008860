@@ -54,7 +54,7 @@ public class CsvSampleRepository implements SampleRepository {
     }
 
     @Override
-    public boolean update(Sample sample) {
+    public synchronized boolean update(Sample sample) {
         List<Sample> all = findAll();
         boolean found = false;
         for (int i = 0; i < all.size(); i++) {

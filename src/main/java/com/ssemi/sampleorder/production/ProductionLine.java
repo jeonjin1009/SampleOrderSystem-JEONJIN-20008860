@@ -49,6 +49,7 @@ public class ProductionLine {
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 ProductionJob job = queue.take();
+                job.setStartTime(System.currentTimeMillis());
                 currentJob = job;
                 try {
                     Thread.sleep(job.getProductionTimeMs());

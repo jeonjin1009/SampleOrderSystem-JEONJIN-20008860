@@ -1,6 +1,7 @@
 package com.ssemi.sampleorder.view;
 
 import com.ssemi.sampleorder.controller.OrderController;
+import com.ssemi.sampleorder.controller.ProductionController;
 import com.ssemi.sampleorder.controller.SampleController;
 import com.ssemi.sampleorder.model.OrderStatus;
 import com.ssemi.sampleorder.model.Sample;
@@ -12,16 +13,21 @@ public class MainView {
 
     private final SampleController sampleController;
     private final OrderController orderController;
+    private final ProductionController productionController;
     private final SampleView sampleView;
     private final OrderView orderView;
+    private final ProductionView productionView;
     private final Scanner scanner;
 
-    public MainView(SampleController sampleController, OrderController orderController, Scanner scanner) {
+    public MainView(SampleController sampleController, OrderController orderController,
+                    ProductionController productionController, Scanner scanner) {
         this.sampleController = sampleController;
         this.orderController = orderController;
+        this.productionController = productionController;
         this.scanner = scanner;
         this.sampleView = new SampleView(sampleController, scanner);
         this.orderView = new OrderView(orderController, sampleController, scanner);
+        this.productionView = new ProductionView(productionController);
     }
 
     public void run() {
@@ -32,7 +38,7 @@ public class MainView {
             System.out.println("2. 시료 주문");
             System.out.println("3. 주문 승인/거절");
             System.out.println("4. 모니터링             (추후 구현)");
-            System.out.println("5. 생산 라인 조회       (추후 구현)");
+            System.out.println("5. 생산 라인 조회");
             System.out.println("6. 출고 처리            (추후 구현)");
             System.out.println("0. 종료");
             System.out.print("선택 > ");
@@ -49,9 +55,11 @@ public class MainView {
                     orderView.showApproveRejectMenu();
                     break;
                 case "4":
-                case "5":
                 case "6":
                     System.out.println("추후 구현 예정입니다.");
+                    break;
+                case "5":
+                    productionView.showProductionStatus();
                     break;
                 case "0":
                     return;
@@ -74,7 +82,7 @@ public class MainView {
         System.out.println("등록 시료 수: " + totalSamples);
         System.out.println("전체 재고 수: " + totalStock);
         System.out.println("전체 주문 수: " + totalOrders);
-        System.out.println("생산 대기 건수: (추후 구현)");
+        System.out.println("생산 대기 건수: " + productionController.getWaitingCount());
     }
 
     private void showSampleMenu() {

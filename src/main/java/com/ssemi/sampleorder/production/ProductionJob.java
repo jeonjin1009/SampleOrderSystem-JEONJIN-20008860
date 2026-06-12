@@ -6,6 +6,7 @@ public class ProductionJob {
     private String sampleId;
     private int requiredQty;
     private long productionTimeMs;
+    private long startTime;
 
     public ProductionJob(String orderId, String sampleId, int requiredQty, long productionTimeMs) {
         this.orderId = orderId;
@@ -18,4 +19,6 @@ public class ProductionJob {
     public String getSampleId() { return sampleId; }
     public int getRequiredQty() { return requiredQty; }
     public long getProductionTimeMs() { return productionTimeMs; }
+    public long getStartTime() { return startTime; }
+    public void setStartTime(long startTime) { this.startTime = startTime; }
 }

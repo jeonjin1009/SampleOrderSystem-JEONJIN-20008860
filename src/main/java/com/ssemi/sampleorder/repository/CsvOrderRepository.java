@@ -56,7 +56,7 @@ public class CsvOrderRepository implements OrderRepository {
     }
 
     @Override
-    public boolean update(Order order) {
+    public synchronized boolean update(Order order) {
         List<Order> all = findAll();
         boolean found = false;
         for (int i = 0; i < all.size(); i++) {
