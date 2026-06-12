@@ -145,13 +145,14 @@ public class OrderView {
 
         Sample sample = sampleController.findSampleById(selected.getSampleId()).orElseThrow();
         int stock = sample.getStock();
+        int availableStock = orderController.getAvailableStock(selected.getSampleId());
         int quantity = selected.getQuantity();
-        if (stock >= quantity) {
-            System.out.println("[재고 현황] 현재 재고 " + stock + "개 — 주문 수량(" + quantity + "개) 충족. 생산이 필요하지 않습니다.");
+        if (availableStock >= quantity) {
+            System.out.println("[재고 현황] 현재 재고 " + stock + "개 (가용 " + availableStock + "개) — 주문 수량(" + quantity + "개) 충족. 생산이 필요하지 않습니다.");
         } else {
-            int shortage = quantity - stock;
+            int shortage = quantity - availableStock;
             int required = (int) Math.ceil(shortage / sample.getYield() / 0.9);
-            System.out.println("[재고 현황] 현재 재고 " + stock + "개 — 부족(" + shortage + "개 부족). 생산이 필요합니다. (생산 필요량: " + required + "개)");
+            System.out.println("[재고 현황] 현재 재고 " + stock + "개 (가용 " + availableStock + "개) — 부족(" + shortage + "개 부족). 생산이 필요합니다. (생산 필요량: " + required + "개)");
         }
 
         System.out.println("처리 선택 > 1. 승인 / 2. 거절");
@@ -170,7 +171,7 @@ public class OrderView {
             if (updated.getStatus() == OrderStatus.CONFIRMED) {
                 System.out.println("승인 완료 (CONFIRMED) — 재고 차감: " + quantity + "개");
             } else {
-                int shortage = quantity - stock;
+                int shortage = quantity - availableStock;
                 int produced = (int) Math.ceil(shortage / sample.getYield() / 0.9);
                 long estimatedMs = sample.getAvgProductionTimeMs() * produced;
                 System.out.println("승인 완료 (PRODUCING) — 생산 등록: " + produced + "개 / 예상 시간: " + estimatedMs + "ms");

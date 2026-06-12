@@ -39,10 +39,12 @@ public class OrderController {
 
         Sample sample = sampleRepository.findById(order.getSampleId()).orElseThrow();
 
-        if (sample.getStock() >= order.getQuantity()) {
+        int availableStock = getAvailableStock(order.getSampleId());
+
+        if (availableStock >= order.getQuantity()) {
             order.setStatus(OrderStatus.CONFIRMED);
         } else {
-            int shortage = order.getQuantity() - sample.getStock();
+            int shortage = order.getQuantity() - availableStock;
             int requiredQty = (int) Math.ceil(shortage / sample.getYield() / 0.9);
             long productionTimeMs = sample.getAvgProductionTimeMs() * requiredQty;
 
@@ -52,6 +54,15 @@ public class OrderController {
 
         orderRepository.update(order);
         return order;
+    }
+
+    public int getAvailableStock(String sampleId) {
+        Sample sample = sampleRepository.findById(sampleId).orElseThrow();
+        int confirmedQty = orderRepository.findByStatus(OrderStatus.CONFIRMED).stream()
+                .filter(o -> o.getSampleId().equals(sampleId))
+                .mapToInt(Order::getQuantity)
+                .sum();
+        return sample.getStock() - confirmedQty;
     }
 
     public Order rejectOrder(String orderId) {

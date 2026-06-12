@@ -95,4 +95,32 @@ class OrderControllerTest {
         assertThrows(IllegalArgumentException.class,
                 () -> orderController.approveOrder("NONE"));
     }
+
+    @Test
+    void approveOrder_CONFIRMED주문있을때_가용재고기준으로PRODUCING전환() {
+        // stock=50, 첫 주문 40개 CONFIRMED → 가용 재고 10개
+        sampleRepository.save(new Sample("S001", "시료A", 1000L, 0.9, 50));
+        Order orderA = orderController.createOrder("S001", "고객A", 40);
+        orderController.approveOrder(orderA.getId());
+
+        // 두 번째 주문 20개 → 가용(10) < 20 → PRODUCING
+        Order orderB = orderController.createOrder("S001", "고객B", 20);
+        Order approved = orderController.approveOrder(orderB.getId());
+
+        assertEquals(OrderStatus.PRODUCING, approved.getStatus());
+    }
+
+    @Test
+    void approveOrder_CONFIRMED주문있어도_가용재고충분하면_CONFIRMED전환() {
+        // stock=50, 첫 주문 20개 CONFIRMED → 가용 재고 30개
+        sampleRepository.save(new Sample("S001", "시료A", 1000L, 0.9, 50));
+        Order orderA = orderController.createOrder("S001", "고객A", 20);
+        orderController.approveOrder(orderA.getId());
+
+        // 두 번째 주문 30개 → 가용(30) >= 30 → CONFIRMED
+        Order orderB = orderController.createOrder("S001", "고객B", 30);
+        Order approved = orderController.approveOrder(orderB.getId());
+
+        assertEquals(OrderStatus.CONFIRMED, approved.getStatus());
+    }
 }
