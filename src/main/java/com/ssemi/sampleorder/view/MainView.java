@@ -69,6 +69,7 @@ public class MainView {
             System.out.println("1. 시료 등록");
             System.out.println("2. 전체 조회");
             System.out.println("3. 이름 검색");
+            System.out.println("4. 시료 삭제");
             System.out.println("0. 뒤로");
             System.out.print("선택 > ");
             String input = scanner.nextLine().trim();
@@ -82,6 +83,9 @@ public class MainView {
                     break;
                 case "3":
                     sampleView.showSearchResult();
+                    break;
+                case "4":
+                    sampleView.showDeleteForm();
                     break;
                 case "0":
                     return;

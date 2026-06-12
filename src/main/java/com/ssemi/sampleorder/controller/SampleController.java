@@ -34,4 +34,10 @@ public class SampleController {
                 .filter(s -> s.getName().toLowerCase().contains(keyword.toLowerCase()))
                 .collect(Collectors.toList());
     }
+
+    public boolean deleteSample(String id) {
+        sampleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시료 ID입니다: " + id));
+        return sampleRepository.deleteById(id);
+    }
 }

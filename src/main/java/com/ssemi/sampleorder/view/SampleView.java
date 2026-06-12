@@ -48,11 +48,26 @@ public class SampleView {
 
     public void showList() {
         List<Sample> samples = sampleController.listSamples();
+        if (samples.isEmpty()) {
+            System.out.println("등록된 시료가 없습니다.");
+            return;
+        }
         System.out.println("ID      이름        평균생산시간(ms)  수율   재고");
         System.out.println("--------------------------------------------------");
         for (Sample s : samples) {
             System.out.printf("%-8s%-12s%-18d%-7.2f%d%n",
                     s.getId(), s.getName(), s.getAvgProductionTimeMs(), s.getYield(), s.getStock());
+        }
+    }
+
+    public void showDeleteForm() {
+        System.out.print("삭제할 시료 ID > ");
+        String id = scanner.nextLine().trim();
+        try {
+            sampleController.deleteSample(id);
+            System.out.println("삭제 완료: " + id);
+        } catch (IllegalArgumentException e) {
+            System.out.println("오류: " + e.getMessage());
         }
     }
 

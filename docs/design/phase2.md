@@ -11,12 +11,14 @@ Phase 1에서 만든 `CsvSampleRepository`를 실제로 활용하는 첫 번째 
 
 | 구현 항목 | 설명 |
 |---|---|
-| `SampleController` | 시료 등록 / 전체 조회 / 이름 검색 비즈니스 로직 |
-| `SampleView` | 시료 입력 폼, 테이블 출력 콘솔 UI |
+| `SampleController` | 시료 등록 / 전체 조회 / 이름 검색 / **삭제** 비즈니스 로직 |
+| `SampleView` | 시료 입력 폼, 테이블 출력, **삭제 폼** 콘솔 UI |
 | `MainView` | 메인 메뉴 루프, 요약 정보 섹션 |
 | `App.java` | 메인 메뉴 루프, 요약 정보 섹션 연동 |
 | 중복 ID 검증 | 동일 ID 시료 등록 시 예외 처리 후 재입력 유도 |
 | 요약 정보 | 등록 시료 수 / 전체 재고 수 메인 메뉴에 반영 |
+| **빈 목록 안내** | 전체 조회 시 등록된 시료 없으면 "등록된 시료가 없습니다." 출력 (IMP-001) |
+| **시료 삭제** | ID 입력 후 시료 삭제, 없는 ID 시 오류 메시지 (IMP-002) |
 
 ---
 
@@ -64,6 +66,9 @@ public class SampleController {
 
     // 이름 포함 검색 (대소문자 무시)
     public List<Sample> searchByName(String keyword);
+
+    // 시료 삭제 — 없는 ID 시 IllegalArgumentException (IMP-002)
+    public boolean deleteSample(String id);
 }
 ```
 
@@ -77,11 +82,14 @@ public class SampleView {
     // 시료 등록 폼 — 중복 ID 오류 시 오류 메시지 출력 후 재입력 루프
     public void showAddForm();
 
-    // 전체 시료 목록 테이블 출력 (ID 오름차순)
+    // 전체 시료 목록 테이블 출력 (ID 오름차순) — 빈 목록 시 안내 메시지 (IMP-001)
     public void showList();
 
     // 이름 검색 입력 → 결과 출력 → 계속 검색 여부 확인 루프
     public void showSearchResult();
+
+    // 시료 삭제 폼 — ID 입력 후 삭제 처리 (IMP-002)
+    public void showDeleteForm();
 }
 ```
 
