@@ -73,8 +73,8 @@ com.ssemi.sampleorder
 
 **목표**: 시료를 등록·조회·검색할 수 있다
 
-- [ ] `SampleController` — 등록 / 전체 조회 / 이름 검색 로직
-- [ ] `SampleView` — 시료 입력 폼, 테이블 출력, 중복 ID 재입력 루프
+- [ ] `SampleController` — 등록 / 전체 조회 / 이름 검색 / 삭제 로직 (IMP-002)
+- [ ] `SampleView` — 시료 입력 폼, 테이블 출력, 중복 ID 재입력 루프, 삭제 폼 (IMP-002), 빈 목록 안내 (IMP-001)
 - [ ] `MainView` — 메인 메뉴 루프, 요약 정보 출력
 - [ ] `App.java` — MainView 연결, 메뉴 루프 통합
 - [ ] 시료 등록 시 중복 ID 검증 (예외 발생 후 재입력 유도)
@@ -86,13 +86,14 @@ com.ssemi.sampleorder
 
 **목표**: 주문을 생성하고 승인·거절 처리할 수 있다
 
-- [ ] `OrderController` — 주문 생성(RESERVED), 승인, 거절 로직
-- [ ] `OrderView` — 주문 입력 폼, RESERVED 목록 출력
-- [ ] 주문 생성 시 유효한 시료 ID인지 검증
-- [ ] 주문 승인 처리 분기
+- [x] `OrderController` — 주문 생성(RESERVED), 승인, 거절 로직 **(Phase 1 완료)**
+- [x] `ProductionLine` — 생산 큐, FIFO 처리 **(Phase 1 완료)**
+- [x] 주문 생성 시 유효한 시료 ID인지 검증 **(Phase 1 완료)**
+- [x] 주문 승인 처리 분기 **(Phase 1 완료)**
   - 재고 충분 → 즉시 `CONFIRMED`로 전환, 재고 차감
   - 재고 부족 → `PRODUCING`으로 전환 후 생산 큐에 자동 등록
-- [ ] 주문 거절 → 즉시 `REJECTED`로 전환
+- [x] 주문 거절 → 즉시 `REJECTED`로 전환 **(Phase 1 완료)**
+- [ ] `OrderView` — 주문 입력 폼, RESERVED 목록 출력
 - [ ] 메인 메뉴 요약 정보에서 전체 주문 수 반영
 
 ---

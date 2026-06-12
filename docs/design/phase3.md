@@ -172,7 +172,7 @@ RESERVED 주문 없을 시:
 | # | 포인트 | 선택지 |
 |---|---|---|
 | 1 | **주문 선택 방식** | 번호(인덱스) 선택 vs 주문 ID 직접 입력 — 번호 선택이 편리하나 동시성 상황에서 인덱스가 바뀔 수 있음 |
-| 2 | **전체 주문 수 집계 기준** | REJECTED 제외(RESERVED + PRODUCING + CONFIRMED + RELEASE)로 집계 vs 전체 주문 수 표기 |
+| 2 | **전체 주문 수 집계 기준** | ✅ **결정 완료: REJECTED 제외 집계** (RESERVED + PRODUCING + CONFIRMED + RELEASE) |
 | 3 | **존재하지 않는 sampleId 주문 입력 시** | 오류 후 재입력 루프(현재 설계) vs 오류 출력 후 메뉴로 복귀 |
 
 ### P2 — UI/UX (방향 결정)
