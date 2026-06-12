@@ -1,0 +1,12 @@
+[submodule "ConsoleMVC"]
+	path = ConsoleMVC
+	url = https://github.com/jeonjin1009/ConsoleMVC-JEONJIN-20008860.git
+[submodule "DataPersistence"]
+	path = DataPersistence
+	url = https://github.com/jeonjin1009/DataPersistence-JEONJIN-20008860.git
+[submodule "DataMonitor"]
+	path = DataMonitor
+	url = https://github.com/jeonjin1009/DataMonitor-JEONJIN-20008860.git
+[submodule "DummyDataGenerator"]
+	path = DummyDataGenerator
+	url = https://github.com/jeonjin1009/DummyDataGenerator-JEONJIN-20008860.git
