@@ -59,8 +59,8 @@ class MonitoringControllerTest {
     }
 
     @Test
-    void getStockStatus_여유_재고충분() {
-        // 재고 100, 주문 수량 합계 10 → 재고(100) > 주문합계(10)의 30% → 여유
+    void getStockStatus_여유_재고가주문합계이상() {
+        // 재고 100 >= 주문 합계 10 → 여유
         sampleRepository.save(new Sample("S001", "시료A", 1000L, 0.9, 100));
         orderRepository.save(new Order("O001", "S001", "고객A", 10, OrderStatus.RESERVED));
 
@@ -70,8 +70,19 @@ class MonitoringControllerTest {
     }
 
     @Test
-    void getStockStatus_부족_30퍼센트이하() {
-        // 재고 2, 주문 수량 합계 10 → 재고(2) <= 주문합계(10)의 30%(3) → 부족
+    void getStockStatus_여유_재고가주문합계와동일() {
+        // 재고 10 == 주문 합계 10 → 여유 (경계값)
+        sampleRepository.save(new Sample("S001", "시료A", 1000L, 0.9, 10));
+        orderRepository.save(new Order("O001", "S001", "고객A", 10, OrderStatus.RESERVED));
+
+        StockStatus status = monitoringController.getStockStatus("S001");
+
+        assertEquals(StockStatus.SUFFICIENT, status);
+    }
+
+    @Test
+    void getStockStatus_부족_재고가주문합계미만() {
+        // 재고 2 < 주문 합계 10 → 부족
         sampleRepository.save(new Sample("S001", "시료A", 1000L, 0.9, 2));
         orderRepository.save(new Order("O001", "S001", "고객A", 10, OrderStatus.RESERVED));
 
@@ -91,16 +102,23 @@ class MonitoringControllerTest {
     }
 
     @Test
-    void getStockStatus_CONFIRMED_RELEASE_주문_제외() {
-        // S001 재고 5
+    void getStockStatus_주문없을때_여유() {
+        // 주문 합계 0 → 재고(5) >= 0 → 여유
         sampleRepository.save(new Sample("S001", "시료A", 1000L, 0.9, 5));
-        // CONFIRMED quantity=100: 현재 구현은 이를 합산하므로 5 ≤ 100×0.3=30 → SHORT
-        orderRepository.save(new Order("O001", "S001", "고객A", 100, OrderStatus.CONFIRMED));
-        // RESERVED quantity=10: 수정 후에는 RESERVED만 합산 → 5 > 10×0.3=3 → SUFFICIENT
-        orderRepository.save(new Order("O002", "S001", "고객B", 10, OrderStatus.RESERVED));
 
-        // 수정 후 기대값: SUFFICIENT (CONFIRMED 제외, RESERVED만 합산)
-        // 현재 구현: SHORT (CONFIRMED 포함 합산) → FAIL
+        StockStatus status = monitoringController.getStockStatus("S001");
+
+        assertEquals(StockStatus.SUFFICIENT, status);
+    }
+
+    @Test
+    void getStockStatus_CONFIRMED_RELEASE_주문_제외() {
+        // 재고 10, CONFIRMED 주문 100개 (합산 제외), RESERVED 주문 10개 (합산 포함)
+        // 재고(10) >= RESERVED 합계(10) → 여유
+        sampleRepository.save(new Sample("S001", "시료A", 1000L, 0.9, 10));
+        orderRepository.save(new Order("O001", "S001", "고객A", 100, OrderStatus.CONFIRMED));
+        orderRepository.save(new Order("O002", "S001", "고객B", 10,  OrderStatus.RESERVED));
+
         StockStatus status = monitoringController.getStockStatus("S001");
 
         assertEquals(StockStatus.SUFFICIENT, status);

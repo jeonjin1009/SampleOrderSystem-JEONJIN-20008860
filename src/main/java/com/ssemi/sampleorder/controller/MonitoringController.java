@@ -41,7 +41,7 @@ public class MonitoringController {
                 .mapToInt(Order::getQuantity)
                 .sum();
 
-        if (sample.getStock() > totalOrdered * 0.3) {
+        if (sample.getStock() >= totalOrdered) {
             return StockStatus.SUFFICIENT;
         }
         return StockStatus.SHORT;
