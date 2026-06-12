@@ -35,6 +35,7 @@ src/
 │   │   ├── OrderController.java      ← 껍데기
 │   │   ├── MonitoringController.java ← 껍데기
 │   │   └── ReleaseController.java    ← 껍데기
+│   │   (SampleController.java는 Phase 2에서 추가)
 │   ├── production/
 │   │   ├── ProductionJob.java   ← 껍데기
 │   │   └── ProductionLine.java  ← 껍데기
@@ -187,8 +188,8 @@ public interface OrderRepository {
 |---|---|
 | `getOrderCountByStatus_상태별_집계정확` | 각 상태별 주문 수 집계 값 검증 |
 | `getOrderCountByStatus_REJECTED_제외` | REJECTED 주문은 집계에 포함되지 않음 |
-| `getStockStatus_여유_재고충분` | 재고 > 주문수량 × 30% → 여유 |
-| `getStockStatus_부족_30퍼센트이하` | 0 < 재고 ≤ 주문수량 × 30% → 부족 |
+| `getStockStatus_여유_재고충분` | 재고 > 주문수량 × 0.3 → 여유 |
+| `getStockStatus_부족_30퍼센트이하` | 0 < 재고 ≤ 주문수량 × 0.3 → 부족 |
 | `getStockStatus_고갈_재고없음` | 재고 == 0 → 고갈 |
 
 ### 4-6. ReleaseControllerTest

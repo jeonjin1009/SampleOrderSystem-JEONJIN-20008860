@@ -74,8 +74,10 @@ com.ssemi.sampleorder
 **목표**: 시료를 등록·조회·검색할 수 있다
 
 - [ ] `SampleController` — 등록 / 전체 조회 / 이름 검색 로직
-- [ ] `SampleView` — 시료 입력 폼, 테이블 출력
-- [ ] 시료 등록 시 중복 ID 검증
+- [ ] `SampleView` — 시료 입력 폼, 테이블 출력, 중복 ID 재입력 루프
+- [ ] `MainView` — 메인 메뉴 루프, 요약 정보 출력
+- [ ] `App.java` — MainView 연결, 메뉴 루프 통합
+- [ ] 시료 등록 시 중복 ID 검증 (예외 발생 후 재입력 유도)
 - [ ] 메인 메뉴 요약 정보에서 등록 시료 수 / 전체 재고 수 반영
 
 ---
@@ -120,7 +122,7 @@ com.ssemi.sampleorder
 
 - [ ] `MonitoringController` — 상태별 주문 수, 시료별 재고 현황 집계
 - [ ] `MonitoringView` — 주문량 현황 테이블, 재고 상태 테이블 출력
-  - 재고 상태 표기: 여유(재고 > 주문의 30%) / 부족(0 < 재고 ≤ 30%) / 고갈(재고 = 0)
+  - 재고 상태 표기: 여유(재고 > 주문수량 × 0.3) / 부족(0 < 재고 ≤ 주문수량 × 0.3) / 고갈(재고 = 0)
   - REJECTED 주문은 집계에서 제외
 - [ ] `ReleaseController` — CONFIRMED 주문 목록 조회, 출고 처리 (→ RELEASE)
 - [ ] `ReleaseView` — CONFIRMED 주문 목록 출력, 출고 확인 입력

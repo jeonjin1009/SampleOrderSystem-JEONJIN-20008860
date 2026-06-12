@@ -11,8 +11,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 # 테스트
 ./gradlew test           # 전체 테스트 실행
-./gradlew test --tests "com.example.SomeTest"          # 단일 테스트 클래스 실행
-./gradlew test --tests "com.example.SomeTest.testName" # 단일 테스트 메서드 실행
+./gradlew test --tests "com.ssemi.sampleorder.SomeTest"          # 단일 테스트 클래스 실행
+./gradlew test --tests "com.ssemi.sampleorder.SomeTest.testName" # 단일 테스트 메서드 실행
 
 # 기타
 ./gradlew clean          # 빌드 아티팩트 정리
@@ -26,7 +26,7 @@ Windows에서는 `./gradlew` 대신 `gradlew.bat` 사용.
 - **Language**: Java 17
 - **Build**: Gradle 9.3.0 (Kotlin DSL — `build.gradle.kts`)
 - **Testing**: JUnit 5 (Jupiter)
-- **Group / Artifact**: `org.example` / `SampleOrderSystem`
+- **Group / Artifact**: `com.ssemi` / `SampleOrderSystem`
 
 ## Development Approach: TDD
 
@@ -105,6 +105,7 @@ Phase별 상세 설계 문서는 `docs/design/` 에 위치한다.
 | Phase | 문서 | 내용 |
 |-------|------|------|
 | Phase 1 | [docs/design/phase1.md](docs/design/phase1.md) | 테스트 코드 작성 (TDD Red 단계) — 도메인 모델 시그니처, Repository 인터페이스, 테스트 케이스 목록 |
+| Phase 2 | [docs/design/phase2.md](docs/design/phase2.md) | 시료 관리 — SampleController, SampleView, MainView, 메인 메뉴 루프 |
 
 ## Architecture
 
