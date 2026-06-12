@@ -37,7 +37,7 @@ public class MonitoringController {
         // 진행 중인 주문(RESERVED + PRODUCING)만 재고 압박 지표로 합산
         int totalOrdered = orderRepository.findAll().stream()
                 .filter(o -> o.getSampleId().equals(sampleId))
-                .filter(o -> o.getStatus() == OrderStatus.RESERVED || o.getStatus() == OrderStatus.PRODUCING)
+                .filter(this::isPendingOrder)
                 .mapToInt(Order::getQuantity)
                 .sum();
 
@@ -45,5 +45,9 @@ public class MonitoringController {
             return StockStatus.SUFFICIENT;
         }
         return StockStatus.SHORT;
+    }
+
+    private boolean isPendingOrder(Order o) {
+        return o.getStatus() == OrderStatus.RESERVED || o.getStatus() == OrderStatus.PRODUCING;
     }
 }

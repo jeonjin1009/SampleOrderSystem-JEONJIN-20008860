@@ -72,7 +72,7 @@ public class CsvOrderRepository implements OrderRepository {
     }
 
     @Override
-    public boolean deleteById(String id) {
+    public synchronized boolean deleteById(String id) {
         List<Order> all = findAll();
         boolean removed = all.removeIf(o -> o.getId().equals(id));
         if (!removed) return false;

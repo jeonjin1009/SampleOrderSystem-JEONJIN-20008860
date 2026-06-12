@@ -5,6 +5,7 @@ import com.ssemi.sampleorder.model.Sample;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.function.Predicate;
 
 public class SampleView {
 
@@ -17,26 +18,17 @@ public class SampleView {
     }
 
     public void showAddForm() {
-        // ID 먼저 수집 — 중복이면 오류 출력 후 재입력
-        String id = "";
-        while (true) {
-            System.out.print("시료 ID > ");
-            String candidate = scanner.nextLine().trim();
-            boolean duplicate = sampleController.listSamples().stream()
-                    .anyMatch(s -> s.getId().equals(candidate));
-            if (!duplicate) { id = candidate; break; }
-            System.out.println("오류: 이미 존재하는 시료 ID입니다. 다시 입력해 주세요.");
-        }
+        String id = readUniqueField(
+            "시료 ID > ",
+            "오류: 이미 존재하는 시료 ID입니다. 다시 입력해 주세요.",
+            candidate -> sampleController.listSamples().stream().anyMatch(s -> s.getId().equals(candidate))
+        );
 
-        String name = "";
-        while (true) {
-            System.out.print("이름 > ");
-            String candidate = scanner.nextLine().trim();
-            boolean duplicate = sampleController.listSamples().stream()
-                    .anyMatch(s -> s.getName().equals(candidate));
-            if (!duplicate) { name = candidate; break; }
-            System.out.println("오류: 이미 존재하는 시료 이름입니다. 다시 입력해 주세요.");
-        }
+        String name = readUniqueField(
+            "이름 > ",
+            "오류: 이미 존재하는 시료 이름입니다. 다시 입력해 주세요.",
+            candidate -> sampleController.listSamples().stream().anyMatch(s -> s.getName().equals(candidate))
+        );
 
         System.out.print("평균생산시간(ms) > ");
         long avgProductionTimeMs = Long.parseLong(scanner.nextLine().trim());
@@ -74,12 +66,7 @@ public class SampleView {
             System.out.println("등록된 시료가 없습니다.");
             return;
         }
-        System.out.println("ID      이름        평균생산시간(ms)  수율   재고");
-        System.out.println("--------------------------------------------------");
-        for (Sample s : samples) {
-            System.out.printf("%-8s%-12s%-18d%-7.2f%d%n",
-                    s.getId(), s.getName(), s.getAvgProductionTimeMs(), s.getYield(), s.getStock());
-        }
+        printSampleTable(samples);
     }
 
     public void showDeleteForm() {
@@ -93,6 +80,24 @@ public class SampleView {
         }
     }
 
+    private String readUniqueField(String prompt, String duplicateErrorMsg, Predicate<String> isDuplicate) {
+        while (true) {
+            System.out.print(prompt);
+            String candidate = scanner.nextLine().trim();
+            if (!isDuplicate.test(candidate)) return candidate;
+            System.out.println(duplicateErrorMsg);
+        }
+    }
+
+    private void printSampleTable(List<Sample> samples) {
+        System.out.println("ID      이름        평균생산시간(ms)  수율   재고");
+        System.out.println("--------------------------------------------------");
+        for (Sample s : samples) {
+            System.out.printf("%-8s%-12s%-18d%-7.2f%d%n",
+                    s.getId(), s.getName(), s.getAvgProductionTimeMs(), s.getYield(), s.getStock());
+        }
+    }
+
     public void showSearchResult() {
         while (true) {
             System.out.print("검색어 > ");
@@ -102,12 +107,7 @@ public class SampleView {
             if (results.isEmpty()) {
                 System.out.println("검색 결과가 없습니다.");
             } else {
-                System.out.println("ID      이름        평균생산시간(ms)  수율   재고");
-                System.out.println("--------------------------------------------------");
-                for (Sample s : results) {
-                    System.out.printf("%-8s%-12s%-18d%-7.2f%d%n",
-                            s.getId(), s.getName(), s.getAvgProductionTimeMs(), s.getYield(), s.getStock());
-                }
+                printSampleTable(results);
             }
 
             System.out.print("계속 검색하시겠습니까? (y/n) > ");

@@ -2,6 +2,7 @@ package com.ssemi.sampleorder.view;
 
 import com.ssemi.sampleorder.controller.ReleaseController;
 import com.ssemi.sampleorder.model.Order;
+import com.ssemi.sampleorder.util.StringUtils;
 
 import java.util.List;
 import java.util.Scanner;
@@ -31,7 +32,7 @@ public class ReleaseView {
             System.out.println("--------------------------------------------------");
             for (int i = 0; i < releasable.size(); i++) {
                 Order o = releasable.get(i);
-                String shortId = o.getId().length() >= 8 ? o.getId().substring(0, 8) : o.getId();
+                String shortId = StringUtils.abbreviateId(o.getId());
                 System.out.printf("%-6d%-20s%-8s%-10s%d%n",
                         i + 1, shortId, o.getSampleId(), o.getCustomerName(), o.getQuantity());
             }
@@ -57,7 +58,7 @@ public class ReleaseView {
 
             Order target = releasable.get(choice - 1);
             releaseController.release(target.getId());
-            String shortId = target.getId().length() >= 8 ? target.getId().substring(0, 8) : target.getId();
+            String shortId = StringUtils.abbreviateId(target.getId());
             System.out.println("출고 완료 (RELEASE) — 주문번호: " + shortId + "...");
         }
     }

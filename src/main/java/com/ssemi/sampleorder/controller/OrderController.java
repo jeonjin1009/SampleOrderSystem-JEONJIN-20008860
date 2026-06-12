@@ -13,6 +13,8 @@ import java.util.UUID;
 
 public class OrderController {
 
+    private static final double PRODUCTION_SAFETY_MARGIN = 0.9;
+
     private final SampleRepository sampleRepository;
     private final OrderRepository orderRepository;
     private final ProductionLine productionLine;
@@ -37,7 +39,8 @@ public class OrderController {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문 ID: " + orderId));
 
-        Sample sample = sampleRepository.findById(order.getSampleId()).orElseThrow();
+        Sample sample = sampleRepository.findById(order.getSampleId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시료 ID: " + order.getSampleId()));
 
         int availableStock = getAvailableStock(order.getSampleId());
 
@@ -45,7 +48,7 @@ public class OrderController {
             order.setStatus(OrderStatus.CONFIRMED);
         } else {
             int shortage = order.getQuantity() - availableStock;
-            int requiredQty = (int) Math.ceil(shortage / sample.getYield() / 0.9);
+            int requiredQty = calculateRequiredQty(shortage, sample.getYield());
             long productionTimeMs = sample.getAvgProductionTimeMs() * requiredQty;
 
             productionLine.submit(new ProductionJob(order.getId(), sample.getId(), requiredQty, productionTimeMs));
@@ -56,15 +59,29 @@ public class OrderController {
         return order;
     }
 
+    public int calculateRequiredQty(int shortage, double yield) {
+        return (int) Math.ceil(shortage / yield / PRODUCTION_SAFETY_MARGIN);
+    }
+
     public int getAvailableStock(String sampleId) {
-        Sample sample = sampleRepository.findById(sampleId).orElseThrow();
+        Sample sample = sampleRepository.findById(sampleId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시료 ID: " + sampleId));
         int reservedQty = orderRepository.findAll().stream()
                 .filter(o -> o.getSampleId().equals(sampleId))
-                .filter(o -> o.getStatus() == OrderStatus.CONFIRMED
-                          || o.getStatus() == OrderStatus.PRODUCING)
+                .filter(this::isCommittedOrder)
                 .mapToInt(Order::getQuantity)
                 .sum();
         return sample.getStock() - reservedQty;
+    }
+
+    private boolean isCommittedOrder(Order o) {
+        return o.getStatus() == OrderStatus.CONFIRMED || o.getStatus() == OrderStatus.PRODUCING;
+    }
+
+    public long countActiveOrders() {
+        return orderRepository.findAll().stream()
+                .filter(o -> o.getStatus() != OrderStatus.REJECTED)
+                .count();
     }
 
     public Order rejectOrder(String orderId) {

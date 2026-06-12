@@ -5,7 +5,6 @@ import com.ssemi.sampleorder.controller.OrderController;
 import com.ssemi.sampleorder.controller.ProductionController;
 import com.ssemi.sampleorder.controller.ReleaseController;
 import com.ssemi.sampleorder.controller.SampleController;
-import com.ssemi.sampleorder.model.OrderStatus;
 import com.ssemi.sampleorder.model.Sample;
 
 import java.util.List;
@@ -85,9 +84,7 @@ public class MainView {
         int totalSamples = samples.size();
         int totalStock = samples.stream().mapToInt(Sample::getStock).sum();
 
-        long totalOrders = orderController.listOrders().stream()
-                .filter(o -> o.getStatus() != OrderStatus.REJECTED)
-                .count();
+        long totalOrders = orderController.countActiveOrders();
 
         System.out.println("=== 현황 요약 ===");
         System.out.println("등록 시료 수: " + totalSamples);

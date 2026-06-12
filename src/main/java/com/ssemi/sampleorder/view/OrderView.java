@@ -5,6 +5,7 @@ import com.ssemi.sampleorder.controller.SampleController;
 import com.ssemi.sampleorder.model.Order;
 import com.ssemi.sampleorder.model.OrderStatus;
 import com.ssemi.sampleorder.model.Sample;
+import com.ssemi.sampleorder.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +66,7 @@ public class OrderView {
         }
 
         Order order = orderController.createOrder(sampleId, customerName, quantity);
-        System.out.println("주문 접수 완료 (주문번호: " + order.getId().substring(0, 8) + "...) — RESERVED");
+        System.out.println("주문 접수 완료 (주문번호: " + StringUtils.abbreviateId(order.getId()) + "...) — RESERVED");
     }
 
     public void showReservedList() {
@@ -96,33 +97,14 @@ public class OrderView {
             return;
         }
 
-        // 시료가 삭제된 주문은 자동 거절 처리 후 목록에서 제외
-        List<Order> validOrders = new ArrayList<>();
-        for (Order o : reserved) {
-            if (sampleController.findSampleById(o.getSampleId()).isPresent()) {
-                validOrders.add(o);
-            } else {
-                orderController.rejectOrder(o.getId());
-                System.out.println("알림 [" + o.getId().substring(0, 8) + "...]: 주문하신 시료가 현재 사라졌습니다. 시료 확인 후 다시 주문 부탁드립니다.");
-            }
-        }
+        List<Order> validOrders = filterValidOrders(reserved);
 
         if (validOrders.isEmpty()) {
             System.out.println("처리 가능한 주문이 없습니다.");
             return;
         }
 
-        System.out.printf("%-4s  %-16s  %-6s  %-8s  %s%n", "번호", "주문ID(앞 8자리)", "시료ID", "고객명", "수량");
-        System.out.println("--------------------------------------------------");
-        for (int i = 0; i < validOrders.size(); i++) {
-            Order o = validOrders.get(i);
-            System.out.printf("%-4d  %-16s  %-6s  %-8s  %d%n",
-                    i + 1,
-                    o.getId().substring(0, 8),
-                    o.getSampleId(),
-                    o.getCustomerName(),
-                    o.getQuantity());
-        }
+        printOrderTable(validOrders);
 
         System.out.print("선택 (번호, 0: 취소) > ");
         String sel = scanner.nextLine().trim();
@@ -141,28 +123,61 @@ public class OrderView {
         }
 
         Order selected = validOrders.get(idx - 1);
-        String orderId = selected.getId();
-
         Sample sample = sampleController.findSampleById(selected.getSampleId()).orElseThrow();
-        int stock = sample.getStock();
         int availableStock = orderController.getAvailableStock(selected.getSampleId());
+
+        printStockInfo(selected, sample, availableStock);
+        handleOrderAction(selected, sample, availableStock);
+    }
+
+    private List<Order> filterValidOrders(List<Order> reserved) {
+        List<Order> validOrders = new ArrayList<>();
+        for (Order o : reserved) {
+            if (sampleController.findSampleById(o.getSampleId()).isPresent()) {
+                validOrders.add(o);
+            } else {
+                orderController.rejectOrder(o.getId());
+                System.out.println("알림 [" + StringUtils.abbreviateId(o.getId()) + "...]: 주문하신 시료가 현재 사라졌습니다. 시료 확인 후 다시 주문 부탁드립니다.");
+            }
+        }
+        return validOrders;
+    }
+
+    private void printOrderTable(List<Order> orders) {
+        System.out.printf("%-4s  %-16s  %-6s  %-8s  %s%n", "번호", "주문ID(앞 8자리)", "시료ID", "고객명", "수량");
+        System.out.println("--------------------------------------------------");
+        for (int i = 0; i < orders.size(); i++) {
+            Order o = orders.get(i);
+            System.out.printf("%-4d  %-16s  %-6s  %-8s  %d%n",
+                    i + 1,
+                    StringUtils.abbreviateId(o.getId()),
+                    o.getSampleId(),
+                    o.getCustomerName(),
+                    o.getQuantity());
+        }
+    }
+
+    private void printStockInfo(Order selected, Sample sample, int availableStock) {
+        int stock = sample.getStock();
         int quantity = selected.getQuantity();
         if (availableStock >= quantity) {
             System.out.println("[재고 현황] 현재 재고 " + stock + "개 (가용 " + availableStock + "개) — 주문 수량(" + quantity + "개) 충족. 생산이 필요하지 않습니다.");
         } else {
             int shortage = quantity - availableStock;
-            int required = (int) Math.ceil(shortage / sample.getYield() / 0.9);
+            int required = orderController.calculateRequiredQty(shortage, sample.getYield());
             System.out.println("[재고 현황] 현재 재고 " + stock + "개 (가용 " + availableStock + "개) — 부족(" + shortage + "개 부족). 생산이 필요합니다. (생산 필요량: " + required + "개)");
         }
+    }
 
+    private void handleOrderAction(Order selected, Sample sample, int availableStock) {
         System.out.println("처리 선택 > 1. 승인 / 2. 거절");
         System.out.print("선택 > ");
         String action = scanner.nextLine().trim();
+        String orderId = selected.getId();
+        int quantity = selected.getQuantity();
 
         if ("1".equals(action)) {
             orderController.approveOrder(orderId);
-
-            // approveOrder 후 주문 상태로 분기
             Order updated = orderController.listOrders().stream()
                     .filter(o -> o.getId().equals(orderId))
                     .findFirst()
@@ -172,7 +187,7 @@ public class OrderView {
                 System.out.println("승인 완료 (CONFIRMED) — 재고 차감: " + quantity + "개");
             } else {
                 int shortage = quantity - availableStock;
-                int produced = (int) Math.ceil(shortage / sample.getYield() / 0.9);
+                int produced = orderController.calculateRequiredQty(shortage, sample.getYield());
                 long estimatedMs = sample.getAvgProductionTimeMs() * produced;
                 System.out.println("승인 완료 (PRODUCING) — 생산 등록: " + produced + "개 / 예상 시간: " + estimatedMs + "ms");
             }

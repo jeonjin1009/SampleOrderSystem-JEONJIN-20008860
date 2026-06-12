@@ -53,18 +53,7 @@ public class ProductionLine {
                 currentJob = job;
                 try {
                     Thread.sleep(job.getProductionTimeMs());
-
-                    Order order = orderRepository.findById(job.getOrderId()).orElse(null);
-                    if (order != null) {
-                        order.setStatus(OrderStatus.CONFIRMED);
-                        orderRepository.update(order);
-                    }
-
-                    Sample sample = sampleRepository.findById(job.getSampleId()).orElse(null);
-                    if (sample != null) {
-                        sample.setStock(sample.getStock() + job.getRequiredQty());
-                        sampleRepository.update(sample);
-                    }
+                    completeJob(job);
                 } finally {
                     currentJob = null;
                 }
@@ -72,6 +61,19 @@ public class ProductionLine {
                 Thread.currentThread().interrupt();
                 break;
             }
+        }
+    }
+
+    private void completeJob(ProductionJob job) {
+        Order order = orderRepository.findById(job.getOrderId()).orElse(null);
+        if (order != null) {
+            order.setStatus(OrderStatus.CONFIRMED);
+            orderRepository.update(order);
+        }
+        Sample sample = sampleRepository.findById(job.getSampleId()).orElse(null);
+        if (sample != null) {
+            sample.setStock(sample.getStock() + job.getRequiredQty());
+            sampleRepository.update(sample);
         }
     }
 }
