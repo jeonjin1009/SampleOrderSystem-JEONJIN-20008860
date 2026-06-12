@@ -106,6 +106,7 @@ Phase별 상세 설계 문서는 `docs/design/` 에 위치한다.
 |-------|------|------|
 | Phase 1 | [docs/design/phase1.md](docs/design/phase1.md) | 테스트 코드 작성 (TDD Red 단계) — 도메인 모델 시그니처, Repository 인터페이스, 테스트 케이스 목록 |
 | Phase 2 | [docs/design/phase2.md](docs/design/phase2.md) | 시료 관리 — SampleController, SampleView, MainView, 메인 메뉴 루프 |
+| Phase 3 | [docs/design/phase3.md](docs/design/phase3.md) | 주문 접수/승인/거절 — OrderView, MainView 메뉴 2·3번 활성화 |
 
 ## Architecture
 
